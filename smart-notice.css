@@ -1,0 +1,30 @@
+.smart-notice {
+    display: none;
+}
+
+.smart-notice .dismiss {
+    background-color: transparent;
+    cursor: pointer;
+    border-width: 1px;
+    border-style: solid;
+    border-color: inherit;
+    margin-left: 10px;
+    padding: 0px 7px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.smart-notice {
+    display: none;
+    opacity: 1;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.smart-notice.show {
+    display: block;
+}
+
+.smart-notice.hide {
+    opacity: 0;
+    /* transform: translateY(20px); */
+}
