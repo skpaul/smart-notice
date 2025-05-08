@@ -40,10 +40,12 @@ import SmartNotice from './smart-notice.js';
 First, add your notification/tip/alert element in HTML:
 
 ```html
-<div id="notice-1" class="notice">
-  <p>💡 This is a smart tip. Dismiss to hide it for 30 days.</p>
-  <button onclick="SmartNotice.dismiss('notice-1', 2592000000)">Dismiss</button>
-</div>
+                      <div class="smart-notice" id="notice-1" data-expiry="604800000">
+                            <div>
+                                This a info
+                                <span class="dismiss">Dismiss</span>
+                            </div>
+                        </div>
 ```
 
 Then initialize it in JavaScript:
@@ -62,20 +64,20 @@ Then initialize it in JavaScript:
 You can manage multiple notices independently.
 
 ```html
-<div id="tip-1">
-  <p>👋 Welcome to the app</p>
-  <button onclick="SmartNotice.dismiss('tip-1', 604800000)">Got it</button> <!-- 7 days -->
-</div>
+            <div class="smart-notice" id="notice-2" data-expiry="604800000">
+                            <div>
+                                This another notice
+                                <span class="dismiss">Dismiss</span>
+                            </div>
+                        </div>
 
-<div id="tip-2">
-  <p>🚀 Try our new feature</p>
-  <button onclick="SmartNotice.dismiss('tip-2', 86400000)">Dismiss</button> <!-- 1 day -->
-</div>
+            <div class="smart-notice" id="notice-3" data-expiry="604800000">
+                            <div>
+                                This another notice
+                                <span class="dismiss">Dismiss</span>
+                            </div>
+                        </div>
 
-<script>
-  SmartNotice.init('tip-1', 604800000); // 7 days
-  SmartNotice.init('tip-2', 86400000);  // 1 day
-</script>
 ```
 
 Each alert remembers **its own** dismissal time.
