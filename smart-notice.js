@@ -1,62 +1,63 @@
-// SmartNotice.js
-const SmartNotice = (function () {
-    const storagePrefix = 'smartNotice:';
+const SmartNotice = (() => {
+    const storageKeyPrefix = 'smart-notice:';
   
-    function getKey(id) {
-      return `${storagePrefix}${id}`;
-    }
+    // Get current timestamp in milliseconds
+    const now = () => new Date().getTime();
   
-    function now() {
-      return Date.now();
-    }
-  
-    function init(id, autoResetMs) {
-      const el = document.getElementById(id);
-      if (!el) return;
-  
-      const data = localStorage.getItem(getKey(id));
-      if (data) {
-        try {
-          const parsed = JSON.parse(data);
-          if (parsed.dismissedAt && (!autoResetMs || now() - parsed.dismissedAt < autoResetMs)) {
-            el.style.display = 'none';
-            return;
-          }
-        } catch (e) {
-          console.warn('Invalid notice data', e);
-        }
+    // Check if the notice should be shown
+    function shouldShow(id) {
+      const stored = localStorage.getItem(storageKeyPrefix + id);
+      if (!stored) return true;
+      try {
+        const data = JSON.parse(stored);
+        return now() > data.expiresAt;
+      } catch (e) {
+        return true; // Fail-safe: show if JSON parse fails
       }
-  
-      el.style.display = '';
     }
   
-    function dismiss(id, autoResetMs) {
-      const el = document.getElementById(id);
-      if (el) el.style.display = 'none';
-  
-      const data = {
-        dismissedAt: now(),
-        autoResetMs: autoResetMs || null,
-      };
-  
-      localStorage.setItem(getKey(id), JSON.stringify(data));
+    // Save dismissed state to localStorage
+    function dismiss(id, expiryMs) {
+      const expiresAt = now() + parseInt(expiryMs || 0, 10);
+      localStorage.setItem(storageKeyPrefix + id, JSON.stringify({ expiresAt }));
     }
   
-    function reset(id) {
-      localStorage.removeItem(getKey(id));
-    }
+    // Initialize all notices on the page
+    function initAll() {
+      document.querySelectorAll('.smart-notice').forEach(notice => {
+        const id = notice.id || null;
+        const expiry = notice.dataset.expiry;
   
-    function clearAll() {
-      Object.keys(localStorage)
-        .filter((key) => key.startsWith(storagePrefix))
-        .forEach((key) => localStorage.removeItem(key));
+        if (!id) return; // Skip if no ID set
+  
+        if (shouldShow(id)) {
+          notice.classList.add('show');
+  
+          // Attach event to internal dismiss button
+          const dismissBtn = notice.querySelector('.dismiss');
+          if (dismissBtn) {
+            dismissBtn.addEventListener('click', () => {
+              dismiss(id, expiry);
+              notice.classList.add('hide');
+              setTimeout(() => {
+                notice.style.display = 'none';
+              }, 600); // Matches CSS transition
+            });
+          }
+        } else {
+          notice.style.display = 'none';
+        }
+      });
     }
   
     return {
-      init,
-      dismiss,
-      reset,
-      clearAll
+      initAll,
+      dismiss
     };
   })();
+  
+  // Initialize when DOM is ready
+  document.addEventListener('DOMContentLoaded', () => {
+    SmartNotice.initAll();
+  });
   
